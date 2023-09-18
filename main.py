@@ -17,7 +17,7 @@ class MyServer(BaseHTTPRequestHandler):
         self.send_response(200) # Отправка кода ответа
         self.send_header("Content-type", "text/html") # Отправка типа данных, который будет передаваться
         self.end_headers() # Завершение формирования заголовков ответа
-        with open('8fe48f48b39e56882b771536d2c28069/index.html', 'r') as f:
+        with open('index.html', 'r') as f:
             file = f.read()
         self.wfile.write(bytes(file, "utf-8"))# Тело ответа
 
