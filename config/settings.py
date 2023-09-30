@@ -78,9 +78,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "djangohwdb",
+        "USER": "postgres",
+        "PASSWORD": "7364",
     }
 }
 
@@ -125,6 +127,7 @@ STATICFILES_DIRS = (
 	BASE_DIR / 'static',
 )
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -134,5 +137,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # My path 
 
 FORM_DATA_PATH = BASE_DIR / 'form_data.txt'
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
