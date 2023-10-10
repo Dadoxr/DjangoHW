@@ -1,0 +1,46 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <fieldset enable>
+        <legend>Добавить товар</legend>
+
+        <div class="mb-3">
+            <input type="name" name="name" id="disabledTextInput" class="form-control" placeholder="Наименование">
+        </div>
+
+        <div class="mb-3">
+            <input type="text" name="description" id="disabledTextInput" class="form-control" placeholder="Описание">
+        </div>
+
+        <div class="mb-3">
+            <select class="form-select" name="category" aria-label="Default select example" >
+                <option selected>Выбирите категорию</option>
+                {% for object in object_list %}
+                    <option value="{{ object }}">{{ object }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <input type="file" name="preview" class="form-control" aria-label="file example" required>
+            <div class="invalid-feedback">Нет файла</div>
+        </div>
+
+        <div class="mb-3">
+            <input type="text" name="price" id="disabledTextInput" class="form-control" placeholder="Цена в рублях">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Создать</button>
+    </fieldset>
+</form>
+
+
+
+
+
+
+
+
+{% endblock %}
