@@ -1,0 +1,40 @@
+{% extends 'catalog/base.html' %}
+{% load my_tags %}
+{% load static %}
+{% block content %}
+<div class=container>
+    <div class="row">
+        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+            <a class="btn mb-3 btn-warning" href="{% url 'blog:update' object.slug %}">Изменить</button>
+            <a class="btn mb-3 btn-danger" href="{% url 'blog:delete' object.slug %}">Удалить</button>
+            {% if object.is_active %}
+                <a class='btn mb-3 btn-outline-dark' href="{% url 'blog:change_is_active' object.slug %}">Деактивировать</a>
+            {% else %}
+                <a class='btn mb-3 btn-outline-dark' href="{% url 'blog:change_is_active' object.slug %}">Опубликовать</a>
+            {% endif %}
+        </div> 
+        <div class="card mb-3 col-12 align-content-center">
+            <center>
+                <img src="/media/{{ object.preview }}" class="card-img-top" alt="Нет картинки", style="width: 300px; height: 300px;">
+            </center>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="card mb-3 col-12">
+        <h3 class="card-title mt-3 mb-3 text-center">{{ object.title }} </h3>
+        <p class="card-text mb-5 text-center">{{ object.body }}</p>
+        <strong class="d-inline-block mb-2 text-primary">
+            {% if object.is_active %}
+                Опубликован
+            {% else %}
+                Не опубликован
+            {% endif %}
+        </strong>
+        <p class="card-text">Дата создания: {{ object.create_at|date:"d.m.Y H:i:s" }}</p>
+        <p class="card-text">Просмотров: {{ object.views }}</p>
+    </div> 
+</div>
+
+
+{% endblock %}

@@ -39,7 +39,7 @@ class Product(models.Model):
 
 class Contact(models.Model):
     name = models.CharField(max_length=100, verbose_name='Имя', null=True, blank=True)
-    phone = models.IntegerField(verbose_name='Телефон', null=True, blank=True)
+    phone = models.BigIntegerField(verbose_name='Телефон', null=True, blank=True)
     message = models.TextField(verbose_name='Сообщение', null=True, blank=True)
 
     def __str__(self):

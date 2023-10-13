@@ -2,3 +2,6 @@
 __pycache__
 .DS_Store
 form_data.txt
+.env
+settings.json
+extensions.json

@@ -1,0 +1,13 @@
+{% extends 'catalog/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <fieldset enable>
+        <legend>Удалить статью: "{{ object }}" ?</legend>
+            <button type="submit" class="btn btn-danger">Удалить</button>
+            <a href="{% url "blog:list" %}" class="btn btn-light">Отмена</a>
+    </fieldset>
+</form>
+
+{% endblock %}

@@ -19,5 +19,8 @@
                 <p>{{ object.description|truncatewords:12 }}</p>
             </ul>
         </div>
+        <div>
+            <a class='btn mb-3 btn-primary' href="{% url "catalog:product" object.pk %}">Посмотреть</a>
+        </div>
     </div>
 </div>
