@@ -25,7 +25,7 @@
             "category": 1,
             "price": 100.0,
             "created_at": "2023-09-30T09:58:23Z",
-            "last_change_date": "2023-09-30T09:58:23Z"
+            "last_change_date": "2023-10-28T18:06:08.599Z"
         }
     },
     {
@@ -38,7 +38,7 @@
             "category": 1,
             "price": 120.0,
             "created_at": "2023-09-30T09:58:23Z",
-            "last_change_date": "2023-09-30T09:58:23Z"
+            "last_change_date": "2023-10-28T17:48:11.824Z"
         }
     },
     {
@@ -64,7 +64,7 @@
             "category": 2,
             "price": 590.0,
             "created_at": "2023-09-30T09:58:23Z",
-            "last_change_date": "2023-09-30T09:58:23Z"
+            "last_change_date": "2023-10-28T16:20:47.632Z"
         }
     },
     {
@@ -107,12 +107,29 @@
         }
     },
     {
-        "model": "catalog.contact",
-        "pk": 1,
+        "model": "catalog.product",
+        "pk": 14,
         "fields": {
-            "name": "Роман",
-            "phone": 78798979,
-            "message": "щвшофщвц"
+            "name": "Булочка",
+            "description": "Булочка",
+            "preview": "images/2023-09-05_10.44.36.jpg",
+            "category": 2,
+            "price": 1234.0,
+            "created_at": "2023-10-12T13:48:20.919Z",
+            "last_change_date": "2023-10-12T13:48:20.920Z"
+        }
+    },
+    {
+        "model": "catalog.product",
+        "pk": 15,
+        "fields": {
+            "name": "Кислобулочка",
+            "description": "Кислобулочка",
+            "preview": "images/2023-09-05_10.44.36_UcyJ3Km.jpg",
+            "category": 1,
+            "price": 111111111.0,
+            "created_at": "2023-10-12T13:50:43.368Z",
+            "last_change_date": "2023-10-12T13:50:43.368Z"
         }
     }
 ]

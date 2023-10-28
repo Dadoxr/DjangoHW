@@ -2,16 +2,20 @@ from django.contrib import admin
 import os, sys
 sys.path.append(os.getcwd())
 
-from catalog.models import Category, Product
+from catalog.models import Category, Product, Version
 
 @admin.register(Category)
-class UnivercityAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
 	list_display = ('id', 'name',)
 	
 	
 @admin.register(Product)
-class UnivercityAdmin(admin.ModelAdmin):
+class ProductAdmin(admin.ModelAdmin):
 	list_display = ('id', 'name', 'price', 'category')
 	list_filter = ('category',)
 	search_fields = ('name', 'description',)
+
+@admin.register(Version)
+class VersionAdmin(admin.ModelAdmin):
+	list_display = ('id', 'product', 'name', 'version', 'is_active', )
 	

@@ -5,3 +5,4 @@ form_data.txt
 .env
 settings.json
 extensions.json
+.pylintrc

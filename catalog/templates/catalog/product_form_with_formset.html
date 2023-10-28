@@ -4,12 +4,17 @@
 <form method="POST" enctype="multipart/form-data">
     
     <fieldset enable>
-        <legend>Добавить товар</legend>
+        <legend>Изменить товар</legend>
         <form method="post" class="my-class">
             {% csrf_token %}
             {{ form|crispy }}
+            {{ formset.management_form }}
+            {% for formvers in formset %}
+                <hr>
+                {{formvers|crispy}}
+            {% endfor %}
         </form>
-        <button type="submit" class="btn btn-primary">Создать</button>
+        <button type="submit" class="btn btn-primary">Изменить</button>
     </fieldset>
 </form>
 

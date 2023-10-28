@@ -1,14 +1,98 @@
 import os, sys
+from typing import Any
+
+from django.forms import ValidationError
 sys.path.append(os.getcwd())
 
+from catalog.models import Contact, Product, Version
+
+## CBV-метод
 from django.urls import reverse, reverse_lazy
-from django.shortcuts import render
-from catalog.models import Contact, Product
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.views.generic import DetailView, CreateView, ListView
+from catalog.forms import ProductForm, VersionForm
+from django.views.generic import DetailView, CreateView, ListView, UpdateView
+from django.forms.models import inlineformset_factory
+
+
+
+class ProductListView(ListView):
+	model = Product
+	paginate_by = 20
+
+	def get_context_data(self, **kwargs):
+		context_data = super().get_context_data(**kwargs)
+		for product in context_data['object_list']:
+			active_version = product.version_set.filter(is_active=True).last()
+			if active_version:
+				product.active_version_number = active_version.version
+				product.active_version_name = active_version.name
+			else:
+				product.active_version_number = "Нет версии"
+				product.active_version_name = None
+		return context_data
+	
+
+class ContactCreateView(CreateView):
+	model = Contact
+	fields = ('name', 'phone', 'message', )
+	success_url = reverse_lazy('catalog:products')
+
+
+class ProductDetialView(DetailView):
+	model = Product
+
+	def get_queryset(self, *args, **kwargs):
+		queryset = super().get_queryset(*args, **kwargs)
+		queryset = queryset.filter(pk=self.kwargs.get('pk'))
+
+		return queryset
+
+
+class ProductCreateView(CreateView):
+    model = Product
+    form_class = ProductForm
+    success_url = reverse_lazy('catalog:products')
+
+
+class ProductUpdateView(UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/product_form_with_formset.html'
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse('catalog:update', args=[self.get_object().pk])
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+
+        SubjectFormset = inlineformset_factory(Product, Version, form=VersionForm, extra=1)
+        if self.request.method == 'POST':
+            context_data['formset'] = SubjectFormset(self.request.POST, instance=self.object)
+        else:
+            context_data['formset'] = SubjectFormset(instance=self.object)
+        return context_data
+
+    def form_valid(self, form):
+        formset = self.get_context_data()['formset']
+		# self.object = form.save() для создания
+
+        if len([product.get('is_active') for product in formset.cleaned_data if product.get('is_active')]) > 1:
+            raise ValidationError('Возможна лишь одна активная версия. Пожалуйста, активируйте только 1 версию.')
+
+        if formset.is_valid():
+            formset.instance = self.object
+            formset.save()
+
+        return super().form_valid(form)
+
+
 
 
 ## FBV-метод
+
+# from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+# from django.shortcuts import render
+# from django.urls import reverse
+
 # def products(request):
 # 	all_products = Product.objects.all() 
 # 	paginator = Paginator(all_products, 3)  
@@ -24,14 +108,6 @@ from django.views.generic import DetailView, CreateView, ListView
 # 	return render(request, 'catalog/products.html', context)
 
 
-## CBV-метод
-class ProductListView(ListView):
-	model = Product
-	paginate_by = 3
-
-
-
-## FBV-метод
 # def contact(request):
 # 	if request.method == 'POST':
 # 		name = request.POST.get('name')
@@ -40,34 +116,14 @@ class ProductListView(ListView):
 # 		Contact.objects.create(name=name, phone=phone, message=message)
 # 	return render(request, 'catalog/contact.html')
 
-## CBV-метод
-class ContactCreateView(CreateView):
-	model = Contact
-	fields = ('name', 'phone', 'message', )
-	success_url = reverse_lazy('catalog:products')
 
-
-
-## FBV-метод
 # def product(request):
 # 	first_object = Product.objects.all().first()
 # 	context = {'object': first_object}
 
 # 	return render(request, 'catalog/product.html', context)
 
-## CBV-метод
-class ProductDetialView(DetailView):
-	model = Product
 
-	def get_queryset(self, *args, **kwargs):
-		queryset = super().get_queryset(*args, **kwargs)
-		queryset = queryset.filter(pk=self.kwargs.get('pk'))
-
-		return queryset
-
-
-
-## FBV-метод
 # def add_product(request):
 # 	categories = Category.objects.all()
 # 	context = {'object_list': categories}
@@ -83,8 +139,3 @@ class ProductDetialView(DetailView):
 # 	return render(request, 'catalog/add_product.html', context)
 
 
-## CBV-метод
-class ProductCreateView(CreateView):
-	model = Product
-	fields = ('name', 'description', 'preview', 'category', 'price')
-	success_url = reverse_lazy('catalog:products')
