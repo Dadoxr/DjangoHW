@@ -1,21 +1,10 @@
 from django import forms
 
 from catalog.models import Product, Version
+from django.conf import settings
 
 class ProductForm(forms.ModelForm):
     """ Формирование формы продуктов """
-
-    stop_words_list = [
-        'казино', 
-        'криптовалюта', 
-        'крипта', 
-        'биржа', 
-        'дешево', 
-        'бесплатно', 
-        'обман', 
-        'полиция', 
-        'радар'
-        ]
 
     class Meta:
         """ Описание формы продуктов """
@@ -33,28 +22,37 @@ class ProductForm(forms.ModelForm):
     def clean_name(self):
         """ Проверяет стоп слова в названии """
 
-        cleaned_data = self.cleaned_data.get('name')
+        name = self.cleaned_data.get('name')
 
-        for word in self.stop_words_list:
-            if word in cleaned_data.lower():
-                raise forms.ValidationError(f'Нельзя использовать слово "{word}"')
+        if self._field_contains_forbidden_words(name):
+                raise forms.ValidationError('Название содержит запрещенные слова')
 
-        return cleaned_data
+        return name
     
-
     def clean_description(self):
         """ Проверяет стоп слова в описании """
 
-        cleaned_data = self.cleaned_data.get('description')
+        description = self.cleaned_data.get('description')
 
-        for word in self.stop_words_list:
-            if word in cleaned_data.lower():
-                raise forms.ValidationError(f'Нельзя использовать слово "{word}"')
+        if self._field_contains_forbidden_words(description):
+                raise forms.ValidationError('Название содержит запрещенные слова')
         
-        return cleaned_data
+        return description
+
+    @staticmethod
+    def _field_contains_forbidden_words(field_value: str) -> bool:
+        field_value = field_value.lower()
+        return any(field_value in forbidden_word for forbidden_word in settings.STOP_WORDS_LIST)
+
+
 
 class VersionForm(forms.ModelForm):
     
     class Meta:
         model = Version
         fields = "__all__"
+
+
+
+
+

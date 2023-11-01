@@ -69,3 +69,12 @@ class Version(models.Model):
     class Meta:
         verbose_name = 'версия'
         verbose_name_plural = 'версии'
+
+        # чтобы нельзя было создавать несколько активных версий для одного продукта
+        constraints = [
+            models.UniqueConstraint(
+                fields=['product'],
+                condition=models.Q(is_active=True),
+                name='only_one_active_version_for_product',
+            ),
+        ]
