@@ -1,18 +1,26 @@
 import os, sys
 from typing import Any
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from django.forms import ValidationError
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 sys.path.append(os.getcwd())
 
 from catalog.models import Contact, Product, Version
 
 ## CBV-метод
 from django.urls import reverse, reverse_lazy
-from catalog.forms import ProductForm, VersionForm
+from catalog.forms import ProductForm, ProductStaffForm, VersionForm
 from django.views.generic import DetailView, CreateView, ListView, UpdateView
 from django.forms.models import BaseModelForm, inlineformset_factory
 
+
+
+class ContactCreateView(CreateView):
+	model = Contact
+	fields = ('name', 'phone', 'message', )
+	success_url = reverse_lazy('catalog:products')
 
 
 class ProductListView(ListView):
@@ -23,7 +31,10 @@ class ProductListView(ListView):
         context_data = super().get_context_data(**kwargs)
 
         if self.request.user.is_authenticated:
-            context_data['object_list'] = Product.objects.filter(owner=self.request.user)
+            if self.request.user.is_staff:
+                context_data['object_list'] = Product.objects.all()
+            else:
+                context_data['object_list'] = Product.objects.filter(owner=self.request.user)
         for product in context_data.get('object_list', []):
             active_version = product.version_set.filter(is_active=True).last()
             if active_version:
@@ -35,25 +46,28 @@ class ProductListView(ListView):
         return context_data
 	
 
-class ContactCreateView(CreateView):
-	model = Contact
-	fields = ('name', 'phone', 'message', )
-	success_url = reverse_lazy('catalog:products')
 
+class ProductDetialView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    model = Product
+    permission_required = 'catalog.view_product'
+    
+    def get_object(self, *args, **kwargs):
+        self.object = super().get_object(*args, **kwargs)
+        if self.object.owner == self.request.user or self.request.user.is_staff:
+            return self.object
+        raise Http404
+        
 
-class ProductDetialView(DetailView):
-	model = Product
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset(*args, **kwargs)
+        queryset = queryset.filter(pk=self.kwargs.get('pk'))
+        return queryset
+    
 
-	def get_queryset(self, *args, **kwargs):
-		queryset = super().get_queryset(*args, **kwargs)
-		queryset = queryset.filter(pk=self.kwargs.get('pk'))
-
-		return queryset
-
-
-class ProductCreateView(CreateView):
+class ProductCreateView(PermissionRequiredMixin, CreateView):
     model = Product
     form_class = ProductForm
+    permission_required = 'catalog.add_product'
     success_url = reverse_lazy('catalog:products')
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
@@ -63,22 +77,35 @@ class ProductCreateView(CreateView):
         return super().form_valid(form)
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(PermissionRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
+    permission_required = 'catalog.change_product'
     template_name = 'catalog/product_form_with_formset.html'
 
+    def get_form_class(self):
+        form_class = super().get_form_class()
+        if self.request.user.is_staff and self.object.owner != self.request.user:
+            form_class = ProductStaffForm
+        return form_class
+
+    def get_object(self, *args, **kwargs):
+        self.object = super().get_object(*args, **kwargs)
+        if self.object.owner == self.request.user or self.request.user.is_staff:
+            return self.object
+        raise Http404
+    
     def get_success_url(self, *args, **kwargs):
         return reverse('catalog:update', args=[self.get_object().pk])
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-
-        SubjectFormset = inlineformset_factory(Product, Version, form=VersionForm, extra=1)
-        if self.request.method == 'POST':
-            context_data['formset'] = SubjectFormset(self.request.POST, instance=self.object)
-        else:
-            context_data['formset'] = SubjectFormset(instance=self.object)
+        if not self.request.user.is_staff:
+            SubjectFormset = inlineformset_factory(Product, Version, form=VersionForm, extra=1)
+            if self.request.method == 'POST':
+                context_data['formset'] = SubjectFormset(self.request.POST, instance=self.object)
+            else:
+                context_data['formset'] = SubjectFormset(instance=self.object)
         return context_data
 
     def form_valid(self, form):

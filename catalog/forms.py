@@ -3,6 +3,19 @@ from django import forms
 from catalog.models import Product, Version
 from django.conf import settings
 
+
+class ProductStaffForm(forms.ModelForm):
+    """ Формирование формы продуктов """
+
+    class Meta:
+        """ Описание формы продуктов """
+
+        model = Product
+        fields = ("description", "category", "is_published",)
+
+
+
+
 class ProductForm(forms.ModelForm):
     """ Формирование формы продуктов """
 
@@ -10,7 +23,7 @@ class ProductForm(forms.ModelForm):
         """ Описание формы продуктов """
 
         model = Product
-        fields = ("name", "description", "preview", "category", "price", )
+        fields = ("name", "description", "preview", "category", "price", "is_published",)
 
 
     def __init__(self, *args, **kwargs):

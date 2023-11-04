@@ -3,7 +3,9 @@
 {% block content %}
 <div class="container">
     <div class="row text-center">
-        <a class="p-2 btn btn-outline-primary" href="{% url "blog:create" %}">Создать</a>
+        {% if perms.blog.add_blog %}
+            <a class="p-2 btn btn-outline-primary" href="{% url "blog:create" %}">Создать</a>
+        {% endif %}
     </div>
 </div>
 <div class="row mb-2">

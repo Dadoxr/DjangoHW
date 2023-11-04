@@ -27,6 +27,7 @@ class Product(models.Model):
     created_at = models.DateTimeField(default=timezone.now(), verbose_name='Дата создания')
     last_change_date = models.DateTimeField(auto_now=True, verbose_name='Дата последнего изменения')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='владелец', blank=True, null=True)
+    is_published = models.BooleanField(default=False, verbose_name='опубликован')
 
     def __str__(self):
         return f'{self.name}({self.category}): {self.description}\
@@ -38,6 +39,7 @@ class Product(models.Model):
         verbose_name = 'товар'
         verbose_name_plural = 'товары'
         ordering = ('id',)
+
 
 
 class Contact(models.Model):

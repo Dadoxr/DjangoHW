@@ -1,4 +1,5 @@
 from typing import Any
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db import models
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -27,8 +28,9 @@ class BlogDetailView(DetailView):
         return self.object
     
 
-class BlogCreateView(CreateView):
+class BlogCreateView(PermissionRequiredMixin, CreateView):
     model = Blog
+    permission_required = 'blog.add_blog'
     fields =('title', 'body', 'preview', 'is_active', )
     success_url = reverse_lazy('blog:list') 
 
@@ -42,16 +44,18 @@ class BlogCreateView(CreateView):
         return super().form_valid(form)
 
 
-class BlogUpdateView(UpdateView):
+class BlogUpdateView(PermissionRequiredMixin, UpdateView):
     model = Blog
+    permission_required = 'blog.change_blog'
     fields =('title', 'body', 'preview', 'is_active', )
 
     def get_success_url(self) -> str:
         return reverse('blog:article', args=[self.kwargs.get('slug')])
     
 
-class BlogDeleteView(DeleteView):
+class BlogDeleteView(PermissionRequiredMixin, DeleteView):
     model = Blog
+    permission_required = 'blog.delete_blog'
     success_url = reverse_lazy('blog:list')
 
 
