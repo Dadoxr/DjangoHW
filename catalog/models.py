@@ -1,5 +1,7 @@
 from django.db import models
-from django.utils import timezone 
+from django.utils import timezone
+
+from users.models import User 
 
 NULLABLE = {'blank': True, 'null': True}
 
@@ -24,6 +26,7 @@ class Product(models.Model):
     price = models.FloatField(verbose_name='Цена за покупку')
     created_at = models.DateTimeField(default=timezone.now(), verbose_name='Дата создания')
     last_change_date = models.DateTimeField(auto_now=True, verbose_name='Дата последнего изменения')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='владелец', blank=True, null=True)
 
     def __str__(self):
         return f'{self.name}({self.category}): {self.description}\

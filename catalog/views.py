@@ -2,6 +2,7 @@ import os, sys
 from typing import Any
 
 from django.forms import ValidationError
+from django.http import HttpResponse
 sys.path.append(os.getcwd())
 
 from catalog.models import Contact, Product, Version
@@ -10,25 +11,28 @@ from catalog.models import Contact, Product, Version
 from django.urls import reverse, reverse_lazy
 from catalog.forms import ProductForm, VersionForm
 from django.views.generic import DetailView, CreateView, ListView, UpdateView
-from django.forms.models import inlineformset_factory
+from django.forms.models import BaseModelForm, inlineformset_factory
 
 
 
 class ProductListView(ListView):
-	model = Product
-	paginate_by = 20
+    model = Product
+    paginate_by = 8
 
-	def get_context_data(self, **kwargs):
-		context_data = super().get_context_data(**kwargs)
-		for product in context_data['object_list']:
-			active_version = product.version_set.filter(is_active=True).last()
-			if active_version:
-				product.active_version_number = active_version.version
-				product.active_version_name = active_version.name
-			else:
-				product.active_version_number = "Нет версии"
-				product.active_version_name = None
-		return context_data
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+
+        if self.request.user.is_authenticated:
+            context_data['object_list'] = Product.objects.filter(owner=self.request.user)
+        for product in context_data.get('object_list', []):
+            active_version = product.version_set.filter(is_active=True).last()
+            if active_version:
+                product.active_version_number = active_version.version
+                product.active_version_name = active_version.name
+            else:
+                product.active_version_number = "Нет версии"
+                product.active_version_name = None
+        return context_data
 	
 
 class ContactCreateView(CreateView):
@@ -51,6 +55,12 @@ class ProductCreateView(CreateView):
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:products')
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        self.object = form.save()
+        self.object.owner = self.request.user
+        self.object.save()
+        return super().form_valid(form)
 
 
 class ProductUpdateView(UpdateView):

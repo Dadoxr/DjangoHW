@@ -1,0 +1,17 @@
+{% extends 'catalog/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class='justify-content-center d-flex flex-row'>
+<form method="POST" enctype="multipart/form-data">
+    
+    <fieldset enable>
+        <legend>Войти</legend>
+        <form method="post" class="my-class">
+            {% csrf_token %}
+            {{ form|crispy }}
+        </form>
+        <button type="submit" class="btn btn-primary">Войти</button>
+    </fieldset>
+</form>
+</div>
+{% endblock %}

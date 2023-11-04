@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     'catalog',
     'blog',
+    'users',
     "crispy_forms",
     "crispy_bootstrap5",
 ]
@@ -147,13 +148,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 FORM_DATA_PATH = BASE_DIR / 'form_data.txt'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+# указываем директорию, в которую будут складываться файлы писем
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+
 EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER') 
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+
+EMAIL_HOST_USER = 'thisisroman444@yandex.ru'#os.getenv('EMAIL_HOST_USER') 
+EMAIL_HOST_PASSWORD = 'ewtzqrknsoinvlow'#os.getenv('EMAIL_HOST_PASSWORD')  
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
 
 STOP_WORDS_LIST = [
         'казино', 
@@ -166,3 +175,8 @@ STOP_WORDS_LIST = [
         'полиция', 
         'радар'
         ]
+
+AUTH_USER_MODEL = 'users.User'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+PASSWORD_RESET_EMAIL_TEMPLATE = 'users/password_reset_email.html'

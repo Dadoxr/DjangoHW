@@ -6,3 +6,4 @@ form_data.txt
 settings.json
 extensions.json
 .pylintrc
+sent_emails/
