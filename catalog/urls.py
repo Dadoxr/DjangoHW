@@ -1,4 +1,6 @@
 import os, sys
+
+from django.views.decorators.cache import cache_page, never_cache
 sys.path.append(os.getcwd())
 
 from django.urls import path
@@ -14,9 +16,9 @@ urlpatterns = [
     # path('add_product/', add_product, name='add_product'),
     
     path('', ProductListView.as_view(), name='products'),
-    path('contacts/', ContactCreateView.as_view(), name='contacts'),
-    path('product/<int:pk>', ProductDetialView.as_view(), name='product'),
-    path('add_product/', ProductCreateView.as_view(), name='add_product'),
-    path('update/<int:pk>', ProductUpdateView.as_view(), name='update'),
+    path('contacts/', never_cache(ContactCreateView.as_view()), name='contacts'),
+    path('product/<int:pk>', cache_page(60)(ProductDetialView.as_view()), name='product'),
+    path('add_product/', never_cache(ProductCreateView.as_view()), name='add_product'),
+    path('update/<int:pk>', never_cache(ProductUpdateView.as_view()), name='update'),
 
 ]

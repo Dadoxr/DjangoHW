@@ -1,10 +1,10 @@
 import os, sys
-from typing import Any
-from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from django.forms import ValidationError
 from django.http import Http404, HttpResponse
+
+from catalog.services import get_all_products_from_cache_or_db
 sys.path.append(os.getcwd())
 
 from catalog.models import Contact, Product, Version
@@ -32,7 +32,7 @@ class ProductListView(ListView):
 
         if self.request.user.is_authenticated:
             if self.request.user.is_staff:
-                context_data['object_list'] = Product.objects.all()
+                context_data['object_list'] = get_all_products_from_cache_or_db()
             else:
                 context_data['object_list'] = Product.objects.filter(owner=self.request.user)
         for product in context_data.get('object_list', []):
