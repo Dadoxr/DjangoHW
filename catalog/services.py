@@ -12,4 +12,7 @@ def get_all_products_from_cache_or_db():
         if products is None:
             products = Product.objects.all()
             cache.set('all_products', products)
-        return products
+    else:
+        products = Product.objects.all()
+    
+    return products
